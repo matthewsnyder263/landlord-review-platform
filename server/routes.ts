@@ -1,6 +1,7 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { rentCastService } from "./rentcast-service";
 import { insertLandlordSchema, insertReviewSchema, insertVoteSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -10,21 +11,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { sortBy, filterRating, search, location } = req.query;
       
-      let landlords;
-      if (search) {
-        landlords = await storage.searchLandlords(
-          search as string, 
+      let landlords = [];
+      
+      // If searching, first try RentCast API for real data
+      if (search || location) {
+        try {
+          const rentCastLandlords = await rentCastService.searchProperties(
+            search as string || "", 
+            location as string | undefined
+          );
+          landlords = rentCastLandlords;
+        } catch (error) {
+          console.log("RentCast API unavailable, falling back to local data");
+        }
+        
+        // Also include local landlords that match the search
+        const localLandlords = await storage.searchLandlords(
+          search as string || "", 
           location as string | undefined
         );
+        
+        // Merge results, avoiding duplicates
+        const allLandlords = [...landlords];
+        localLandlords.forEach(local => {
+          const exists = allLandlords.some(existing => 
+            existing.name.toLowerCase() === local.name.toLowerCase() &&
+            existing.location.toLowerCase() === local.location.toLowerCase()
+          );
+          if (!exists) {
+            allLandlords.push(local);
+          }
+        });
+        
+        landlords = allLandlords;
       } else {
+        // No search, just get local landlords
         landlords = await storage.getAllLandlords(
           sortBy as string | undefined,
           filterRating ? parseInt(filterRating as string) : undefined
         );
       }
       
+      // Apply filtering and sorting to combined results
+      if (filterRating) {
+        const minRating = parseInt(filterRating as string);
+        landlords = landlords.filter(landlord => 
+          (landlord.averageRating || 0) >= minRating
+        );
+      }
+      
+      // Sort results
+      switch (sortBy) {
+        case 'highest-rated':
+          landlords.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+          break;
+        case 'lowest-rated':
+          landlords.sort((a, b) => (a.averageRating || 0) - (b.averageRating || 0));
+          break;
+        case 'most-reviews':
+          landlords.sort((a, b) => (b.totalReviews || 0) - (a.totalReviews || 0));
+          break;
+        default:
+          landlords.sort((a, b) => b.id - a.id); // Most recent
+      }
+      
       res.json(landlords);
     } catch (error) {
+      console.error("Error fetching landlords:", error);
       res.status(500).json({ message: "Failed to fetch landlords" });
     }
   });
