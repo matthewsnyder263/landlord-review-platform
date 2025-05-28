@@ -20,6 +20,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             search as string || "", 
             location as string | undefined
           );
+          
+          // Save RentCast landlords to database so they can be accessed later
+          for (const landlord of rentCastLandlords) {
+            try {
+              // Check if landlord already exists
+              const existing = await storage.getLandlordByName(landlord.name);
+              if (!existing) {
+                await storage.createLandlord({
+                  name: landlord.name,
+                  location: landlord.location,
+                  address: landlord.address
+                });
+              }
+            } catch (error) {
+              // Continue if landlord already exists
+            }
+          }
+          
           landlords = rentCastLandlords;
         } catch (error) {
           console.log("RentCast API unavailable, falling back to local data");

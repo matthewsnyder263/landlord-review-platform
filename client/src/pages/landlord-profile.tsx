@@ -1,4 +1,4 @@
-import { useParams } from "wouter";
+import { useParams, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -46,14 +46,26 @@ export default function LandlordProfile() {
       <div className="min-h-screen bg-surface">
         <Header onWriteReview={() => setIsReviewModalOpen(true)} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6">
+            <Link href="/">
+              <Button variant="outline" className="gap-2">
+                ← Back to Search
+              </Button>
+            </Link>
+          </div>
           <Card>
             <CardContent className="py-12 text-center">
               <h2 className="text-2xl font-semibold text-text-primary mb-4">
                 Landlord Not Found
               </h2>
-              <p className="text-text-secondary">
-                The landlord you're looking for doesn't exist.
+              <p className="text-text-secondary mb-6">
+                The landlord you're looking for doesn't exist in our database yet.
               </p>
+              <Link href="/">
+                <Button>
+                  Search for Landlords
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
