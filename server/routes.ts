@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { rentCastService } from "./rentcast-service";
+import { propertyScraperService } from "./property-scraper";
 import { insertLandlordSchema, insertReviewSchema, insertVoteSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -235,6 +236,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Vote recorded successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to record vote" });
+    }
+  });
+
+  // Enhanced search with real property owner data
+  app.get("/api/enhanced-search", async (req, res) => {
+    try {
+      const { search, location } = req.query;
+      
+      if (!search || !location) {
+        return res.status(400).json({ message: "Search query and location are required" });
+      }
+
+      // First get properties from RentCast
+      const rentCastProperties = await rentCastService.searchProperties(
+        search as string, 
+        location as string
+      );
+
+      // Enhance each property with real owner information
+      const enhancedProperties = await Promise.all(
+        rentCastProperties.map(async (property) => {
+          try {
+            // Try to get real property owner information
+            const ownerInfo = await propertyScraperService.getPropertyOwner(
+              property.address || property.name,
+              property.location,
+              'US' // You could parse state from location
+            );
+
+            if (ownerInfo && ownerInfo.success) {
+              // Create or update landlord with real owner name
+              const existingLandlord = await storage.getLandlordByName(ownerInfo.ownerName);
+              
+              if (existingLandlord) {
+                return existingLandlord;
+              } else {
+                // Create new landlord with real owner info
+                const newLandlord = await storage.createLandlord({
+                  name: ownerInfo.ownerName,
+                  location: property.location,
+                  address: property.address || property.name
+                });
+                return newLandlord;
+              }
+            }
+            
+            // If scraping fails, return the original property
+            return property;
+          } catch (error) {
+            console.error('Error enhancing property with owner info:', error);
+            return property;
+          }
+        })
+      );
+
+      res.json(enhancedProperties);
+    } catch (error) {
+      console.error('Enhanced search error:', error);
+      res.status(500).json({ message: "Failed to perform enhanced search" });
     }
   });
 
