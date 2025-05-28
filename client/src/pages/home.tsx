@@ -31,6 +31,16 @@ export default function Home() {
     queryKey: ["/api/landlords", buildQueryParams()],
     queryFn: async () => {
       const params = buildQueryParams();
+      
+      // Use enhanced search when we have both search query and location
+      if (searchQuery && location) {
+        const enhancedUrl = `/api/enhanced-search?search=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(location)}`;
+        const response = await fetch(enhancedUrl);
+        if (!response.ok) throw new Error("Failed to fetch enhanced search results");
+        return response.json();
+      }
+      
+      // Otherwise use regular search
       const url = params ? `/api/landlords?${params}` : "/api/landlords";
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch landlords");

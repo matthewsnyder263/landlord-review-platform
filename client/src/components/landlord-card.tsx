@@ -32,6 +32,11 @@ export default function LandlordCard({ landlord }: LandlordCardProps) {
             <Link href={`/landlord/${landlord.id}`}>
               <h4 className="text-xl font-semibold text-text-primary hover:text-primary cursor-pointer transition-colors">
                 {landlord.name}
+                {landlord.name === "Unknown Property Owner" && (
+                  <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                    Property Data Only
+                  </span>
+                )}
               </h4>
             </Link>
             <p className="text-text-secondary">{landlord.location}</p>
