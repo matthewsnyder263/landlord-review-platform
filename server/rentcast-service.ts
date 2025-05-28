@@ -36,6 +36,11 @@ export class RentCastService {
 
   async searchProperties(query: string, location?: string): Promise<Landlord[]> {
     try {
+      // Only make API call if we have meaningful search criteria
+      if (!query && !location) {
+        return [];
+      }
+
       // Build search parameters
       const params = new URLSearchParams();
       params.set("limit", "50");
@@ -47,7 +52,8 @@ export class RentCastService {
           params.set("city", locationParts[0]);
           params.set("state", locationParts[1]);
         } else {
-          params.set("address", location);
+          // If just one part, assume it's a city and try common states
+          params.set("city", locationParts[0]);
         }
       }
       
