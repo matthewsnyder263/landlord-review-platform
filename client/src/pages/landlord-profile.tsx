@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { MapPin, ThumbsUp, ThumbsDown } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import ShareReviewButton from "@/components/share-review-button";
 import type { Landlord, Review } from "@shared/schema";
 
 export default function LandlordProfile() {
@@ -194,15 +195,24 @@ export default function LandlordProfile() {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-4 text-text-secondary text-sm">
-                    <button className="hover:text-primary flex items-center space-x-1">
-                      <ThumbsUp className="w-4 h-4" />
-                      <span>Helpful ({review.helpfulVotes || 0})</span>
-                    </button>
-                    <button className="hover:text-primary flex items-center space-x-1">
-                      <ThumbsDown className="w-4 h-4" />
-                      <span>Not Helpful ({review.notHelpfulVotes || 0})</span>
-                    </button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4 text-text-secondary text-sm">
+                      <button className="hover:text-primary flex items-center space-x-1">
+                        <ThumbsUp className="w-4 h-4" />
+                        <span>Helpful ({review.helpfulVotes || 0})</span>
+                      </button>
+                      <button className="hover:text-primary flex items-center space-x-1">
+                        <ThumbsDown className="w-4 h-4" />
+                        <span>Not Helpful ({review.notHelpfulVotes || 0})</span>
+                      </button>
+                    </div>
+                    {landlord && (
+                      <ShareReviewButton 
+                        review={review} 
+                        landlord={landlord}
+                        className="ml-auto"
+                      />
+                    )}
                   </div>
                 </CardContent>
               </Card>
