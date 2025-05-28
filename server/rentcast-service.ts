@@ -2,14 +2,20 @@ import type { Landlord, InsertLandlord } from "@shared/schema";
 
 interface RentCastProperty {
   id: string;
-  address: string;
+  formattedAddress: string;
+  addressLine1: string;
+  addressLine2?: string;
   city: string;
   state: string;
   zipCode: string;
-  propertyManager?: string;
-  landlord?: string;
-  ownerName?: string;
-  managementCompany?: string;
+  county: string;
+  latitude: number;
+  longitude: number;
+  propertyType: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFootage?: number;
+  yearBuilt?: number;
 }
 
 interface RentCastResponse {
@@ -64,10 +70,10 @@ export class RentCastService {
         return [];
       }
 
-      const data: RentCastResponse = await response.json();
+      const data: RentCastProperty[] = await response.json();
       
       // Convert RentCast properties to landlord records
-      const landlords = this.convertPropertiesToLandlords(data.properties);
+      const landlords = this.convertPropertiesToLandlords(data);
       return landlords;
 
     } catch (error) {
