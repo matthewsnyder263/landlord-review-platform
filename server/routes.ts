@@ -298,6 +298,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test endpoint for Frederick County property scraping
+  app.get("/api/test-frederick-scraping", async (req, res) => {
+    try {
+      const testAddress = "100 N Market St"; // A real address in Frederick, MD
+      const result = await propertyScraperService.getPropertyOwner(
+        testAddress,
+        "Frederick",
+        "MD"
+      );
+      
+      res.json({
+        address: testAddress,
+        result: result,
+        success: result?.success || false,
+        message: result ? "Property owner data found!" : "No property owner data found"
+      });
+    } catch (error) {
+      console.error('Frederick test error:', error);
+      res.status(500).json({ 
+        message: "Error testing Frederick County scraping",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Create subscription payment intent
   app.post("/api/create-subscription", async (req, res) => {
     try {

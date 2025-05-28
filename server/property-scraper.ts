@@ -104,6 +104,63 @@ export class PropertyScraperService {
     }
   }
 
+  // Scrape Frederick County, MD property data
+  async scrapeFrederickCountyProperty(address: string): Promise<PropertyOwnerInfo | null> {
+    try {
+      // Frederick County uses Maryland State Property View
+      const searchUrl = `https://sdatcert3.resiusa.org/rp_rewrite/`;
+      
+      const response = await axios.get(searchUrl, {
+        params: {
+          'county': '11', // Frederick County code
+          'address': address
+        },
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+
+      const $ = cheerio.load(response.data);
+      
+      // Look for owner information in Maryland SDAT format
+      let ownerName = '';
+      
+      // Try multiple selectors for owner information
+      ownerName = $('table').find('td:contains("Owner")').next().text().trim() ||
+                 $('table').find('td:contains("OWNER")').next().text().trim() ||
+                 $('.owner-name').text().trim() ||
+                 $('span:contains("Owner:")').parent().text().replace('Owner:', '').trim();
+      
+      if (ownerName && ownerName !== '' && ownerName.length > 2) {
+        // Clean up the owner name
+        ownerName = ownerName.split('\n')[0].trim();
+        ownerName = ownerName.replace(/\s+/g, ' ');
+        
+        return {
+          ownerName,
+          address,
+          city: 'Frederick',
+          state: 'MD',
+          success: true,
+          source: 'Maryland SDAT Property Records'
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Frederick County scraping error:', error);
+      
+      // Fallback to generic search for Frederick
+      try {
+        return await this.scrapeGenericProperty(address, 'Frederick', 'MD');
+      } catch (fallbackError) {
+        console.error('Frederick fallback error:', fallbackError);
+        return null;
+      }
+    }
+  }
+
   // Scrape Cook County (Chicago) property data
   async scrapeCookCountyProperty(address: string): Promise<PropertyOwnerInfo | null> {
     try {
@@ -155,6 +212,8 @@ export class PropertyScraperService {
         return await this.scrapeLACountyProperty(address);
       } else if (normalizedState === 'il' && normalizedCity.includes('chicago')) {
         return await this.scrapeCookCountyProperty(address);
+      } else if (normalizedState === 'md' && normalizedCity.includes('frederick')) {
+        return await this.scrapeFrederickCountyProperty(address);
       }
       
       // For other locations, try a generic approach using Google search
