@@ -1,6 +1,11 @@
-import { landlords, reviews, votes, type Landlord, type Review, type Vote, type InsertLandlord, type InsertReview, type InsertVote } from "@shared/schema";
+import { landlords, reviews, votes, users, type Landlord, type Review, type Vote, type User, type InsertLandlord, type InsertReview, type InsertVote, type UpsertUser } from "@shared/schema";
+import { DatabaseStorage } from "./database-storage";
 
 export interface IStorage {
+  // User operations
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
   // Landlord operations
   getLandlord(id: number): Promise<Landlord | undefined>;
   getLandlordByName(name: string): Promise<Landlord | undefined>;
@@ -341,4 +346,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

@@ -1,6 +1,28 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, real, varchar, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Session storage table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table for authentication
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 export const landlords = pgTable("landlords", {
   id: serial("id").primaryKey(),
@@ -14,11 +36,13 @@ export const landlords = pgTable("landlords", {
   ethicsRating: real("ethics_rating").default(0),
   maintenanceRating: real("maintenance_rating").default(0),
   communicationRating: real("communication_rating").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
   landlordId: integer("landlord_id").notNull(),
+  userId: varchar("user_id"), // Link to authenticated user
   authorName: text("author_name"),
   isAnonymous: boolean("is_anonymous").default(false),
   overallRating: integer("overall_rating").notNull(),
@@ -36,6 +60,7 @@ export const reviews = pgTable("reviews", {
 export const votes = pgTable("votes", {
   id: serial("id").primaryKey(),
   reviewId: integer("review_id").notNull(),
+  userId: varchar("user_id"), // Link to authenticated user
   voterIp: text("voter_ip").notNull(),
   isHelpful: boolean("is_helpful").notNull(),
 });
@@ -49,6 +74,7 @@ export const insertLandlordSchema = createInsertSchema(landlords).omit({
   ethicsRating: true,
   maintenanceRating: true,
   communicationRating: true,
+  createdAt: true,
 });
 
 export const insertReviewSchema = createInsertSchema(reviews).omit({
@@ -70,6 +96,14 @@ export const insertVoteSchema = createInsertSchema(votes).omit({
   id: true,
 });
 
+// User schemas
+export const insertUserSchema = createInsertSchema(users).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
 export type InsertLandlord = z.infer<typeof insertLandlordSchema>;
 export type Landlord = typeof landlords.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
