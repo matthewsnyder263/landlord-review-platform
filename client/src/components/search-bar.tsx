@@ -39,7 +39,7 @@ export default function SearchBar({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="pl-10 pr-28 py-4 text-lg border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="pl-10 pr-24 py-4 text-lg border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent w-full"
         />
         <div className="absolute inset-y-0 right-0 pr-2 flex items-center">
           <Button 
