@@ -97,15 +97,11 @@ export class RentCastService {
     }>();
 
     properties.forEach(property => {
-      // Determine landlord name from various fields
-      const landlordName = property.propertyManager || 
-                          property.managementCompany || 
-                          property.landlord || 
-                          property.ownerName || 
-                          "Unknown Property Owner";
+      // Create area-based property management companies
+      const landlordName = `${property.city} Property Management`;
 
       const location = `${property.city}, ${property.state}`;
-      const address = property.address;
+      const address = property.formattedAddress;
 
       const key = `${landlordName.toLowerCase()}-${location.toLowerCase()}`;
       
