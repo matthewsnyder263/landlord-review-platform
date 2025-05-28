@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import { storage } from "./storage";
 import { rentCastService } from "./rentcast-service";
 import { propertyScraperService } from "./property-scraper";
-import { insertLandlordSchema, insertReviewSchema, insertVoteSchema } from "@shared/schema";
+import { insertLandlordSchema, insertReviewSchema, insertVoteSchema, insertContributionSchema } from "@shared/schema";
 import { z } from "zod";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -320,6 +320,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Error testing Frederick County scraping",
         error: error instanceof Error ? error.message : "Unknown error"
       });
+    }
+  });
+
+  // Community contribution endpoint
+  app.post("/api/contribute-landlord-name", async (req, res) => {
+    try {
+      const result = insertContributionSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid input data",
+          errors: result.error.errors 
+        });
+      }
+
+      const contributorIp = req.ip || req.connection.remoteAddress || "unknown";
+      
+      // Check if this IP already contributed for this landlord
+      const existingContribution = await storage.getContributionByIpAndLandlord(
+        contributorIp, 
+        result.data.landlordId
+      );
+
+      if (existingContribution) {
+        return res.status(409).json({ 
+          message: "You have already contributed information for this property" 
+        });
+      }
+
+      // Create the contribution
+      const contribution = await storage.createContribution({
+        ...result.data,
+        contributorIp
+      });
+
+      res.status(201).json({ 
+        message: "Thank you for your contribution!",
+        contribution 
+      });
+    } catch (error) {
+      console.error("Error saving contribution:", error);
+      res.status(500).json({ message: "Failed to save contribution" });
     }
   });
 

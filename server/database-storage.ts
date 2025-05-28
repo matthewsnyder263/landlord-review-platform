@@ -1,4 +1,4 @@
-import { landlords, reviews, votes, users, type Landlord, type Review, type Vote, type User, type InsertLandlord, type InsertReview, type InsertVote, type UpsertUser } from "@shared/schema";
+import { landlords, reviews, votes, users, landlordContributions, type Landlord, type Review, type Vote, type User, type InsertLandlord, type InsertReview, type InsertVote, type UpsertUser, type LandlordContribution, type InsertContribution } from "@shared/schema";
 import { db } from "./db";
 import { eq, ilike, or, desc, sql, and } from "drizzle-orm";
 import type { IStorage } from "./storage";

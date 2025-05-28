@@ -24,6 +24,10 @@ export interface IStorage {
   getVote(reviewId: number, voterIp: string): Promise<Vote | undefined>;
   createVote(vote: InsertVote): Promise<Vote>;
   updateReviewVotes(reviewId: number, isHelpful: boolean, increment: boolean): Promise<void>;
+  
+  // Community contribution operations
+  createContribution(contribution: InsertContribution): Promise<LandlordContribution>;
+  getContributionByIpAndLandlord(contributorIp: string, landlordId: number): Promise<LandlordContribution | undefined>;
 }
 
 export class MemStorage implements IStorage {
