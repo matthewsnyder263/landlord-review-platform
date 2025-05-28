@@ -64,7 +64,7 @@ export default function Home() {
           
           <SearchBar 
             onSearch={handleSearch}
-            placeholder="Search by landlord name or property address..."
+            placeholder="Search landlords or addresses..."
           />
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
