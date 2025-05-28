@@ -238,6 +238,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create subscription payment intent
+  app.post("/api/create-subscription", async (req, res) => {
+    try {
+      const { plan } = req.body;
+      
+      // Define subscription prices (in cents)
+      const subscriptionPrices = {
+        "Premium Tenant": 999,  // $9.99
+        "Landlord Pro": 2999    // $29.99
+      };
+
+      const amount = subscriptionPrices[plan as keyof typeof subscriptionPrices];
+      if (!amount) {
+        return res.status(400).json({ message: "Invalid subscription plan" });
+      }
+
+      // Create a payment intent for subscription
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: "usd",
+        metadata: {
+          subscription_plan: plan,
+          type: "subscription"
+        },
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        amount: amount
+      });
+    } catch (error: any) {
+      console.error("Stripe error:", error);
+      res.status(500).json({ 
+        message: "Error creating subscription payment intent: " + error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
