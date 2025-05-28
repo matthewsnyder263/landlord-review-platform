@@ -6,6 +6,7 @@ import SearchBar from "@/components/search-bar";
 import FilterBar from "@/components/filter-bar";
 import LandlordCard from "@/components/landlord-card";
 import ReviewModal from "@/components/review-modal";
+import ContributeLandlordModal from "@/components/contribute-landlord-modal";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin } from "lucide-react";
@@ -17,6 +18,8 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("most-recent");
   const [filterRating, setFilterRating] = useState<number | undefined>();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isContributeModalOpen, setIsContributeModalOpen] = useState(false);
+  const [contributeData, setContributeData] = useState<{ landlordId: number; address: string } | null>(null);
 
   const buildQueryParams = () => {
     const params = new URLSearchParams();

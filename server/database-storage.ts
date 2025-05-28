@@ -202,4 +202,24 @@ export class DatabaseStorage implements IStorage {
       communicationRating: Math.round(communicationRating * 10) / 10,
     });
   }
+
+  // Community contribution operations
+  async createContribution(insertContribution: InsertContribution): Promise<LandlordContribution> {
+    const [contribution] = await db
+      .insert(landlordContributions)
+      .values(insertContribution)
+      .returning();
+    return contribution;
+  }
+
+  async getContributionByIpAndLandlord(contributorIp: string, landlordId: number): Promise<LandlordContribution | undefined> {
+    const [contribution] = await db
+      .select()
+      .from(landlordContributions)
+      .where(and(
+        eq(landlordContributions.contributorIp, contributorIp),
+        eq(landlordContributions.landlordId, landlordId)
+      ));
+    return contribution;
+  }
 }
