@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import StarRating from "./star-rating";
 import { formatDistanceToNow } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Plus } from "lucide-react";
 import type { Landlord, Review } from "@shared/schema";
+import { useState } from "react";
 
 interface LandlordCardProps {
   landlord: Landlord;
+  onContributeName?: (landlordId: number, address: string) => void;
 }
 
-export default function LandlordCard({ landlord }: LandlordCardProps) {
+export default function LandlordCard({ landlord, onContributeName }: LandlordCardProps) {
   const { data: reviews } = useQuery<Review[]>({
     queryKey: [`/api/landlords/${landlord.id}/reviews`],
   });
@@ -47,11 +49,24 @@ export default function LandlordCard({ landlord }: LandlordCardProps) {
               </span>
             </div>
           </div>
-          <Link href={`/landlord/${landlord.id}`}>
-            <Button variant="ghost" className="text-primary hover:text-blue-700">
-              View All Reviews
-            </Button>
-          </Link>
+          <div className="flex flex-col gap-2">
+            <Link href={`/landlord/${landlord.id}`}>
+              <Button variant="ghost" className="text-primary hover:text-blue-700">
+                View All Reviews
+              </Button>
+            </Link>
+            {landlord.name === "Unknown Property Owner" && onContributeName && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => onContributeName(landlord.id, landlord.address || "")}
+                className="text-green-600 border-green-200 hover:bg-green-50"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Know the landlord?
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Rating Categories */}

@@ -70,6 +70,18 @@ export const votes = pgTable("votes", {
   isHelpful: boolean("is_helpful").notNull(),
 });
 
+export const landlordContributions = pgTable("landlord_contributions", {
+  id: serial("id").primaryKey(),
+  landlordId: integer("landlord_id").notNull(),
+  suggestedName: text("suggested_name").notNull(),
+  contactInfo: text("contact_info"),
+  howYouKnow: text("how_you_know").notNull(),
+  contributorIp: varchar("contributor_ip").notNull(),
+  status: varchar("status").default("pending"), // pending, approved, rejected
+  verificationCount: integer("verification_count").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertLandlordSchema = createInsertSchema(landlords).omit({
   id: true,
   averageRating: true,
@@ -115,3 +127,13 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertVote = z.infer<typeof insertVoteSchema>;
 export type Vote = typeof votes.$inferSelect;
+
+export const insertContributionSchema = createInsertSchema(landlordContributions).omit({
+  id: true,
+  status: true,
+  verificationCount: true,
+  createdAt: true,
+});
+
+export type InsertContribution = z.infer<typeof insertContributionSchema>;
+export type LandlordContribution = typeof landlordContributions.$inferSelect;
