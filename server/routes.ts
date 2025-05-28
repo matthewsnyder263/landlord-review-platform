@@ -1,9 +1,17 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
+import Stripe from "stripe";
 import { storage } from "./storage";
 import { rentCastService } from "./rentcast-service";
 import { insertLandlordSchema, insertReviewSchema, insertVoteSchema } from "@shared/schema";
 import { z } from "zod";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all landlords with optional filtering and sorting

@@ -38,12 +38,16 @@ export default function Header({ onWriteReview }: HeaderProps) {
               >
                 Browse Reviews
               </Link>
-              <a 
-                href="#" 
-                className="text-text-secondary hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
+              <Link 
+                href="/pricing"
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  location === "/pricing" 
+                    ? "text-text-primary" 
+                    : "text-text-secondary hover:text-primary"
+                }`}
               >
-                How It Works
-              </a>
+                Pricing
+              </Link>
             </nav>
           </div>
           <div className="flex items-center space-x-4">

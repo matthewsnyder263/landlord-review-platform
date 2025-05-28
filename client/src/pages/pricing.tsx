@@ -121,9 +121,11 @@ export default function Pricing() {
                     </Button>
                   </Link>
                 ) : (
-                  <Button variant={plan.buttonVariant} className="w-full">
-                    {plan.buttonText}
-                  </Button>
+                  <Link href={`/subscribe?plan=${encodeURIComponent(plan.name)}`}>
+                    <Button variant={plan.buttonVariant} className="w-full">
+                      {plan.buttonText}
+                    </Button>
+                  </Link>
                 )}
               </CardContent>
             </Card>
