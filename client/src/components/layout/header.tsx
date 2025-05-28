@@ -22,19 +22,21 @@ export default function Header({ onWriteReview }: HeaderProps) {
               </Link>
             </div>
             <nav className="hidden md:ml-8 md:flex md:space-x-8">
-              <Link href="/">
-                <a className={`px-3 py-2 text-sm font-medium transition-colors ${
+              <Link 
+                href="/"
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
                   location === "/" 
                     ? "text-text-primary" 
                     : "text-text-secondary hover:text-primary"
-                }`}>
-                  Search
-                </a>
+                }`}
+              >
+                Search
               </Link>
-              <Link href="/">
-                <a className="text-text-secondary hover:text-primary px-3 py-2 text-sm font-medium transition-colors">
-                  Browse Reviews
-                </a>
+              <Link 
+                href="/"
+                className="text-text-secondary hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Browse Reviews
               </Link>
               <a 
                 href="#" 

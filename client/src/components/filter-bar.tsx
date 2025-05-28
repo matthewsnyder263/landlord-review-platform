@@ -30,6 +30,8 @@ export default function FilterBar({
     "Los Angeles, CA",
     "Chicago, IL",
     "Seattle, WA",
+    "Frederick, MD",
+    "Baltimore, MD",
   ];
 
   const ratings = [

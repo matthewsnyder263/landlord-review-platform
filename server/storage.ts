@@ -80,6 +80,30 @@ export class MemStorage implements IStorage {
         maintenanceRating: 4.7,
         communicationRating: 4.9,
       },
+      {
+        name: "Frederick Housing LLC",
+        location: "Frederick, MD",
+        address: "200 East St, Frederick, MD",
+        averageRating: 3.5,
+        totalReviews: 12,
+        depositReturnRating: 3.2,
+        responsivenessRating: 4.1,
+        ethicsRating: 3.8,
+        maintenanceRating: 3.3,
+        communicationRating: 3.6,
+      },
+      {
+        name: "Chesapeake Bay Rentals",
+        location: "Baltimore, MD",
+        address: "500 Harbor Dr, Baltimore, MD",
+        averageRating: 2.8,
+        totalReviews: 15,
+        depositReturnRating: 2.1,
+        responsivenessRating: 3.2,
+        ethicsRating: 2.5,
+        maintenanceRating: 3.1,
+        communicationRating: 3.4,
+      },
     ];
 
     sampleLandlords.forEach(landlord => {
@@ -185,7 +209,23 @@ export class MemStorage implements IStorage {
     return allLandlords.filter(landlord => {
       const matchesQuery = landlord.name.toLowerCase().includes(queryLower) ||
                           (landlord.address && landlord.address.toLowerCase().includes(queryLower));
-      const matchesLocation = !location || landlord.location.toLowerCase().includes(location.toLowerCase());
+      
+      // More flexible location matching - check if any part of the location matches
+      let matchesLocation = true;
+      if (location && location !== "All Locations") {
+        const locationLower = location.toLowerCase();
+        const landlordLocationLower = landlord.location.toLowerCase();
+        const landlordAddressLower = (landlord.address || "").toLowerCase();
+        
+        // Split location into parts (city, state, etc.) for more flexible matching
+        const locationParts = locationLower.split(/[,\s]+/).filter(part => part.length > 0);
+        
+        matchesLocation = locationParts.some(part => 
+          landlordLocationLower.includes(part) || 
+          landlordAddressLower.includes(part)
+        );
+      }
+      
       return matchesQuery && matchesLocation;
     });
   }
