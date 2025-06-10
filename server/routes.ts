@@ -377,7 +377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const amount = subscriptionPrices[plan as keyof typeof subscriptionPrices];
       if (!amount) {
-        return res.status(400).json({ message: "Invalid subscription plan" });
+        return res.status(400).json({ message: `Invalid subscription plan: ${plan}. Available plans: ${Object.keys(subscriptionPrices).join(', ')}` });
       }
 
       // Create a payment intent for subscription
