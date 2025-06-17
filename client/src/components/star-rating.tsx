@@ -36,7 +36,7 @@ export default function StarRating({
       {Array.from({ length: 5 }).map((_, index) => {
         const isFilled = index < Math.floor(rating);
         const isHalfFilled = index === Math.floor(rating) && rating % 1 !== 0;
-        
+
         return (
           <button
             key={index}
@@ -44,17 +44,15 @@ export default function StarRating({
             onClick={() => handleStarClick(index)}
             disabled={!isInteractive}
             className={cn(
-              "relative",
-              isInteractive && "hover:scale-110 transition-transform cursor-pointer",
+              "relative transition-all duration-200",
+              isInteractive && "hover:scale-125 cursor-pointer transform hover:rotate-12",
               !isInteractive && "cursor-default"
             )}
           >
-            <Star
+            <Star 
               className={cn(
-                sizeClasses[size],
-                "text-gray-300",
-                isFilled && "fill-yellow-400 text-yellow-400",
-                isHalfFilled && "fill-yellow-400 text-yellow-400"
+                "absolute inset-0 transition-colors duration-200",
+                isFilled || isHalfFilled ? "text-amber-400 fill-amber-400 drop-shadow-sm" : "text-gray-300 hover:text-amber-200"
               )}
             />
             {isHalfFilled && (
