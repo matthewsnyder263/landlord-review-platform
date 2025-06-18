@@ -1,3 +1,5 @@
+🧪 Originally prototyped in Replit for rapid iteration. Currently being cleaned, extended, and prepared for deployment using Docker + conventional architecture.
+
 # Landlord Review Platform
 
 A web app for finding and reviewing landlords/property managers. Built to help tenants make informed rental decisions.
