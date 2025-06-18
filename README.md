@@ -1,4 +1,4 @@
-🧪 Originally prototyped in Replit for rapid iteration. Currently being cleaned, extended, and prepared for deployment using Docker + conventional architecture.
+Originally prototyped in Replit for rapid iteration. Currently being cleaned, extended, and prepared for deployment using Docker + conventional architecture.
 
 # Landlord Review Platform
 
